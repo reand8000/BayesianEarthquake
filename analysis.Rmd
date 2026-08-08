@@ -16,7 +16,7 @@ library(bayesplot)
 ```
 
 ```{r priorData}
-prior_eqs <- read_csv("data/earthquakes_before_1950.csv")
+prior_eqs <- read_csv("data/earthquakePrior.csv")
 
 prior <- prior_eqs[, c("time", "mag")]
 prior$datetime <- as.POSIXct(prior$time, format = "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
@@ -64,8 +64,6 @@ b <- theta_exp / theta_var
 a <- theta_exp * b
 
 plot_gamma(a, b)
-
-
 ```
 
 

@@ -23,7 +23,7 @@ library(bayesplot)
 
 
 ```{r loadData, include=FALSE}
-prior_eqs <- read_csv("data/earthquakesPrior.csv")
+prior_eqs <- read_csv("data/earthquakePrior.csv")
 
 prior <- prior_eqs[, c("time", "mag")]
 prior$datetime <- as.POSIXct(prior$time, format = "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
