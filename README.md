@@ -26,16 +26,13 @@ estimating when the next event is likely to occur.
 
 All data files live in the `data/` folder: global M8+ earthquakes from the USGS earthquake catalog [link].
 
-| File | Description |
-|------|-------------|
-| `data/[eathquakePrior].csv` | pre-1950 earthquakes for prior |
-| `data/[earthquakes].csv` | post-1950 earthquakes for analysis |
+- `data/earthquakePrior.csv`: pre-1950 earthquakes for prior
+- `data/earthquakes.csv`: post-1950 earthquakes for analysis
 
-##Documents
-| File | Description |
-|------|-------------|
-| `[model].qmd` | theoretical model structure |
-| `[analysis].Rmd` | data analysis and model fitting |
-| `[presentation].qmd` | project slides |
+##  Documents
+
+- `[model].qmd`: theoretical model structure
+- `[analysis].Rmd`: data analysis and model fitting
+- `[presentation].qmd`: project slides
 
 
