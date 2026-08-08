@@ -31,8 +31,8 @@ All data files live in the `data/` folder: global M8+ earthquakes from the USGS 
 
 ##  Documents
 
-- `[model].qmd`: theoretical model structure
-- `[analysis].Rmd`: data analysis and model fitting
-- `[presentation].qmd`: project slides
+- `model.qmd`: theoretical model structure
+- `analysis.Rmd`: data analysis and model fitting
+- `presentation.qmd`: project slides
 
 
