@@ -1,7 +1,7 @@
 # Bayesian Prediction of High-magnitude Earthquake Timing
 
-A Bayesian framework for modeling the time between major earthquakes and
-estimating when the next event is likely to occur.
+A Bayesian framework for modeling the time between major earthquakes and estimating when the next event is likely to occur. 
+Because it conditions on the time since the last quake, its estimates stay current until the next global M8+ (currently on 2025-07-29 Kamchatka earthquake).
 
 ## Rean Du, Oliver Chu, Daniel Ernesto Santos, Keerthana Girish
 

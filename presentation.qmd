@@ -107,7 +107,7 @@ We address two questions using Bayesian inference on historical USGS data:
 
 :::
 ::: {.column width="45%"}
-![](./2026-03-18_23.25.35.png){width=100%}
+![](./pic/recentGlobalM8.png){width=100%}
 ```{r fig0-caption, echo=FALSE, results='asis'}
 cat("<p style='font-size:0.60em; color:gray; margin-top:-10px;'>Fig 1. Global M8+ earthquakes, sourced from the USGS Earthquake Catalog.</p>")
 ```
