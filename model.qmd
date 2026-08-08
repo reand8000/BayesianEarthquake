@@ -1,0 +1,179 @@
+---
+title: "Bayesian Model for Earthquake Inter-Event Times"
+author: "reand8000"
+format:
+  html:
+    toc: true
+    number-sections: true
+  pdf:
+    toc: true
+    number-sections: true
+---
+
+# Model Setup
+
+Let $t$ be the inter-event time between earthquakes. We model each observed
+inter-event time as Gamma-distributed with shape $\alpha = 2$ and rate $\theta$:
+
+$$
+t_i \mid \theta \sim \text{Gamma}(2, \theta),
+\qquad
+f(t \mid \theta) = \frac{\theta^{\alpha}}{\Gamma(\alpha)}\, t^{\alpha - 1} e^{-\theta t}.
+$$
+
+Substituting $\alpha = 2$:
+
+$$
+f(t_i \mid \theta)
+= \frac{\theta^{2}}{\Gamma(2)}\, t_i^{\,2-1} e^{-\theta t_i}
+= \theta^{2}\, t_i\, e^{-\theta t_i}.
+$$
+
+# Likelihood
+
+For $n$ independent inter-event times $t_1, \dots, t_n$:
+
+$$
+L(\theta)
+= \prod_{i=1}^{n} \theta^{2}\, t_i\, e^{-\theta t_i}
+= \theta^{2n} \left( \prod_{i=1}^{n} t_i \right) e^{-\theta \sum t_i}
+\;\propto\; \theta^{2n}\, e^{-\theta \sum t_i}.
+$$
+
+# Prior
+
+A Gamma prior is placed on the rate $\theta$:
+
+$$
+\theta \sim \text{Gamma}(a, b),
+\qquad
+\pi(\theta) = \frac{b^{a}}{\Gamma(a)}\, \theta^{a-1} e^{-b\theta}
+\;\propto\; \theta^{a-1} e^{-b\theta}.
+$$
+
+The prior for the project is estimated by method of moments — matching the pre-1950 data's mean inter-event time to the Gamma moment formulas to recover the shape and rate. Specific calculation: see analysis or presentation.
+
+```{r, echo=FALSE}
+#| label: prior
+#| message: false
+#| fig-cap: "Prior distribution for theta derived from pre-1950 inter-event times."
+
+library(ggplot2)
+
+# Prior hyperparameters (reused by the posterior chunk below)
+a <- 5
+b <- 1120.5
+
+theta_grid <- seq(0, 0.018, length.out = 500)
+prior_df <- data.frame(
+  theta   = theta_grid,
+  density = dgamma(theta_grid, shape = a, rate = b)
+)
+
+ggplot(prior_df, aes(theta, density)) +
+  geom_line() +
+  labs(x = expression(theta), y = expression(f(theta))) +
+  theme_gray()
+```
+
+# Posterior
+
+Posterior is proportion to prior conjugate to likelihood:
+
+$$
+p(\theta \mid t)
+\;\propto\; L(\theta)\, \pi(\theta)
+\;\propto\; \theta^{2n} e^{-\theta \sum t_i} \cdot \theta^{a-1} e^{-b\theta}
+= \theta^{\,a + 2n - 1}\, e^{-(b + \sum t_i)\,\theta}.
+$$
+
+This is the kernel of a Gamma distribution:
+
+$$
+\theta \mid t \sim \text{Gamma}\!\left(a + 2n,\; b + \sum t_i\right),
+\qquad
+\mathbb{E}(\theta \mid t) = \frac{a + 2n}{\,b + \sum t_i\,}.
+$$
+
+# Q1: Given the last earthquake occurred $x$ days ago, what is the expected additional wait until the next one?
+
+Let $T > x$ denote the day of the next
+earthquake. The truncated conditional density is:
+
+$$
+f_{T \mid T > x}(t \mid \theta) = \frac{f_T(t \mid \theta)}{P(T > x \mid \theta)},
+\qquad t > x,
+$$
+
+so the expected residual waiting time is:
+
+$$
+\mathbb{E}[\,T - x \mid T > x, \theta\,]
+= \frac{\displaystyle\int_x^{\infty} (t - x)\, f_T(t \mid \theta)\, dt}
+       {P(T > x \mid \theta)},
+\qquad
+f_T(t \mid \theta) = \theta^{2} t\, e^{-\theta t}.
+$$
+
+## Denominator: Survival Probability
+
+$$
+P(T > x \mid \theta)
+= \int_x^{\infty} \theta^{2} t\, e^{-\theta t}\, dt
+= \Big[-(\theta t + 1)\, e^{-\theta t}\Big]_x^{\infty}
+= e^{-\theta x}\,(1 + \theta x),
+$$
+
+using integration by parts and $e^{-\theta t} \to 0$ as $t \to \infty$.
+
+## Numerator
+
+Substitute $u = t - x$ (so $t = u + x$):
+
+$$
+\int_x^{\infty} (t - x)\, \theta^{2} t\, e^{-\theta t}\, dt
+= \theta^{2} e^{-\theta x}
+  \left[ \int_0^{\infty} u^{2} e^{-\theta u}\, du
+       + x \int_0^{\infty} u\, e^{-\theta u}\, du \right].
+$$
+
+Using the Gamma integral $\displaystyle\int_0^{\infty} u^{k} e^{-\theta u}\, du = \frac{k!}{\theta^{\,k+1}}$:
+
+$$
+= \theta^{2} e^{-\theta x}
+  \left[ \frac{2}{\theta^{3}} + \frac{x}{\theta^{2}} \right]
+= e^{-\theta x}\left( \frac{2}{\theta} + x \right).
+$$
+
+## Result
+
+$$
+\boxed{\;
+\mathbb{E}[\,T - x \mid T > x, \theta\,]
+= \frac{e^{-\theta x}\left( x + \frac{2}{\theta} \right)}
+       {e^{-\theta x}\,(1 + \theta x)}
+= \frac{x + \frac{2}{\theta}}{\,1 + \theta x\,}.
+\;}
+$$
+
+# Q2: What's the probability the next earthquake occurs within $d$ days?
+
+Let $d$ be the number of days from now and $x$ the current day. We want
+$P(T \le x + d \mid T \ge x, \theta)$. By the definition of conditional
+probability:
+
+$$
+P(T \le x + d \mid T \ge x, \theta)
+= \frac{P(x < T \le x + d \mid \theta)}{1 - P(T \le x \mid \theta)}
+= \frac{P(T \le x+d \mid \theta) - P(T \le x \mid \theta)}{1 - P(T \le x \mid \theta)}.
+$$
+
+$\text{Gamma}(2, \theta)$ CDF for $F(t \mid \theta)$:
+
+$$
+\boxed{\;
+P(T \le x + d \mid T \ge x, \theta)
+= \frac{F(x + d \mid \theta) - F(x \mid \theta)}{1 - F(x \mid \theta)}.
+\;}
+$$
+
